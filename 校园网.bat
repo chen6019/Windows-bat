@@ -4,24 +4,6 @@
 @chcp 65001
 @setlocal EnableDelayedExpansion
 
-@REM :: BatchGotAdmin
-@REM echo.
-@REM echo 正在检查权限...
-@REM echo.
-@REM >nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system"
-@REM if '%errorlevel%' NEQ '0' (
-@REM     echo "当前没有管理员权限。"
-@REM     echo.
-@REM     echo "请右键单击本脚本,选择以管理员身份运行。"
-@REM     echo.
-@REM     echo "按任意键退出..."
-@REM     echo.
-@REM     pause
-@REM     exit /b
-@REM ) else (
-@REM     echo 当前拥有管理员权限。
-@REM     goto menu
-@REM )
 
 :menu
 echo.
@@ -91,7 +73,7 @@ echo setlocal EnableDelayedExpansion >> %scriptPath%
 echo echo.  >> %scriptPath%
 echo curl "%url%" >> %scriptPath%
 echo echo.   >> %scriptPath%
-echo echo 有ok字样表示已经登陆成功了,诶嘿(o゜▽゜)o☆~(如果没有出现问题的话)!>> %scriptPath%
+echo echo 有"result":"ok"字样表示已经登陆成功了,诶嘿(o゜▽゜)o☆~(如果没有出现问题的话)!>> %scriptPath%
 echo echo.   >> %scriptPath%
 if /I "%addPause%"=="Y" (
     echo echo 按任意键退出   >> %scriptPath%
@@ -99,10 +81,25 @@ if /I "%addPause%"=="Y" (
 ) else (
     echo 你没有添加 pause,所以登陆后会自动退出脚本
 )
+REM 定义源路径和目标路径
+set "source=%~dp0登陆校园网.bat"
+set "destination=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\登陆校园网.bat"
 
-echo 脚本生成在当前脚本所在目录下: %scriptPath%
+copy "%source%" "%destination%"
+echo 将文件复制到系统自启动目录
+echo.
+set /p choice=是否删除原文件？(输入Y/N) 
+echo.
+if /i "%choice%"=="Y" (
+    del "%source%"
+    echo 脚本已复制到系统自启动目录并删除原文件
+    echo.
+) else (
+    echo 脚本已复制到系统自启动目录没有删除原文件
+    echo.
+)
 echo 如果没有出现文件,请把脚本放到一个没有权限问题的目录下再次尝试(如下载目录和桌面)
-echo 由于权限问题，您需要手动添加脚本到自启动文件夹,当然也可以手动打开脚本进行登陆。
+echo.
 goto :menu
 
 :open
