@@ -1,5 +1,5 @@
 @echo off
-set SSID=TP_LINK
-set KEY=CHEN6019
+set SSID=Internet
+set KEY=chen6019
 
-netsh wlan connect name=%SSID%
+netsh wlan connect name=%SSID% 
