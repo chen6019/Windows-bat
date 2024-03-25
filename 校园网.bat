@@ -1,5 +1,5 @@
 @REM 本脚本由chen6019编写,用于登陆重庆化工职业学院校园网,生成开机自动链接脚本,一键打开开机自启文件夹,一键退出功能
-@REM 感谢使用,如果有问题请联系我,qq:2430914975
+@REM 感谢使用,如果有问题请联系我,邮箱:mc_chen6019@qq.com
 @echo off
 @chcp 65001
 @setlocal EnableDelayedExpansion
