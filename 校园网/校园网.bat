@@ -24,6 +24,7 @@ echo.
 echo 请选择操作:
 echo.
 choice /c 12345 /m "【1】打开登陆网址 【2】生成开机自动登陆脚本【3】一键打开开自启文件夹【4】打开仓库网址(一般用于更新脚本) 【5】一键退出脚本"
+
 set "userChoice="
 set /a userChoice=%errorlevel%
 
@@ -44,9 +45,11 @@ if %userChoice% equ 1 (
 echo.
 echo 打开浏览器访问校园网登陆网址(可自行修改网址)?您是否要继续此操作?
 echo 默认值为Y (Y/N?)
+
+set "choice="
 set /p choice=
 if "choice"=="" set "choice=Y"
-set choice=!choice:~0,1!
+set choice=%choice:~0,1%
 if /I "%choice%"=="Y" (
     echo.
     goto Start
@@ -66,11 +69,11 @@ if %errorlevel% neq 0 (
     echo 打开浏览器失败，请检查你的系统设置。
     echo.
     goto :menu
-
 )
 
 echo 浏览器已成功打开，正在访问校园网登陆网址...
 goto :menu
+
 
 :cancelShutdown
 echo.
@@ -81,9 +84,12 @@ echo.
 echo 注意:再次生成会覆盖旧的文件！！！！您是否要继续此操作?
 echo 默认值为Y (Y/N?)
 echo ====================================================
+
+
+set "choice="
 set /p choice=
 if "choice"=="" set "choice=Y"
-set choice=!choice:~0,1!
+set choice=%choice:~0,1%
 if /I "%choice%"=="Y" (
     echo.
     color 07
@@ -96,15 +102,19 @@ if /I "%choice%"=="Y" (
 
 
 :createScript
-echo 请输入登陆链接:
+echo 请输入登陆链接:(默认值为空)
+set "url="
 set /p url=
+
 echo 是否需要添加 pause？ 添加会在登陆成功后保留结果窗口(一般由于调试)
 echo 默认值为N (Y/N)
+set "addPause="
 set /p addPause=
 if "addPause"=="" set "addPause=N"
-set addPause=!addPause:~0,1!
+set addPause=%addPause:~0,1%
 
 set "scriptPath=%~dp0登陆校园网.bat"
+
 echo @echo off > %scriptPath%
 echo chcp 65001 >> %scriptPath%
 echo setlocal EnableDelayedExpansion >> %scriptPath%
@@ -120,6 +130,7 @@ echo     echo 登录成功 >> %scriptPath%
 echo     echo. >> %scriptPath%
 echo     echo 将于3秒后关闭本脚本 >> %scriptPath%
 echo     timeout /t 3 >> %scriptPath%
+
 if /I "%addPause%"=="Y" (
     echo    echo 按任意键退出   >> %scriptPath%
     echo    pause   >> %scriptPath%
@@ -128,6 +139,7 @@ if /I "%addPause%"=="Y" (
     echo 你没有添加pause,所以登陆后会自动退出脚本
     echo.
 )
+
 echo ) else ( >> %scriptPath%
 echo     color 04 >> %scriptPath%
 echo     echo 登陆失败! >> %scriptPath%
@@ -142,7 +154,6 @@ echo     pause >> %scriptPath%
 echo ) >> %scriptPath%
 
 
-
 REM 定义源路径和目标路径
 set "source=%~dp0登陆校园网.bat"
 set "destination=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\登陆校园网.bat"
@@ -153,21 +164,24 @@ REM 检查文件是否成功复制
 if exist "%destination%" (
     echo 文件成功复制到目标路径
 ) else (
-    echo 文件复制失败,请检查是否拥有写入权限和文件是否生成
+    echo 文件复制失败,请自行检查文件是否生成在当前目录下和复制文件到自启动目录
+    goto :menu
 )
+
 echo.
-set /p choice=是否删除原文件?(输入Y/N) 
+set "choice="
+set /p choice=是否删除原文件?默认值为Y (输入Y/N？) 
+if "%choice%"=="" set "choice=Y"
 echo.
+
 if /i "%choice%"=="Y" (
     del "%source%"
-    echo 以删除原文件
+    echo 原文件已删除
     echo.
 ) else (
     echo 没有删除原文件
     echo.
 )
-echo 如果没有出现文件,请把脚本放到一个没有权限问题的目录下再次尝试(如下载目录和桌面)
-echo.
 goto :menu
 
 :open
@@ -175,9 +189,12 @@ start "" shell:startup
 goto :menu
 
 :openRepository
-echo 是否打开仓库网址?(Y/N)
+echo 是否打开仓库网址?默认值为Y (Y/N)
+set "choice="
 set /p choice=
+if "%choice%"=="" set "choice=Y"
 set choice=%choice:~0,1%
+
 if /I "%choice%"=="Y" (
     echo.
     start "" https://github.com/chen6019/Windows-bat
