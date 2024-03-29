@@ -45,7 +45,7 @@ goto :menu
 echo.
 color 04
 echo ====================================================
-echo 生成开机自动链接脚本？注意:需要你获取到登陆链接(打开校园网登陆网址,打开开发者工具F12,选择网络,打开保留日志,然后登陆校园网,找到第一个get的网址就是了),再次生成会覆盖旧的文件!您是否要继续此操作？(Y/N)
+echo 生成开机自动登陆脚本?注意:需要你获取到登陆链接(打开校园网的登陆网址,打开开发者工具按F12,选择网络(英文为network),然后登陆校园网,找到第一个get请求的网址就是了),注意:再次生成会覆盖旧的文件!您是否要继续此操作?(Y/N)
 echo ====================================================
 set /p choice=
 set choice=!choice:~0,1!
@@ -63,39 +63,69 @@ if /I "%choice%"=="Y" (
 :createScript
 echo 请输入登陆链接:
 set /p url=
-echo 是否需要添加 pause？添加会在登陆成功后保留命令提示符窗口(一般由于调试)(Y/N)
+echo 是否需要添加 pause?添加会在登陆成功后保留结果窗口(一般由于调试)(Y/N或y/n)
 set /p addPause=
 
+
 set "scriptPath=%~dp0登陆校园网.bat"
-echo @echo off   > %scriptPath%
-echo chcp 65001  >> %scriptPath%
+echo @echo off > %scriptPath%
+echo chcp 65001 >> %scriptPath%
 echo setlocal EnableDelayedExpansion >> %scriptPath%
-echo echo.  >> %scriptPath%
-echo curl "%url%" >> %scriptPath%
-echo echo.   >> %scriptPath%
-echo echo 有"result":"ok"字样表示已经登陆成功了,诶嘿(o゜▽゜)o☆~(如果没有出现问题的话)!>> %scriptPath%
-echo echo.   >> %scriptPath%
+echo echo. >> %scriptPath%
+echo echo 正在登录校园网... >> %scriptPath%
+echo echo. >> %scriptPath%
+echo REM 发送请求 >> %scriptPath%
+echo for /f "delims=" %%%%a in ('curl "%url%"') do set response=%%%%a >> %scriptPath%
+echo echo ^^!response^^! ^| findstr /C:"\"result\":\"ok\"" ^>nul >> %scriptPath%
+echo if %%errorlevel%% EQU 0 ( >> %scriptPath%
+echo     color 0A >> %scriptPath%
+echo     echo 登录成功 >> %scriptPath%
+echo     echo. >> %scriptPath%
+echo     echo 将于3秒后关闭本脚本 >> %scriptPath%
+echo     timeout /t 3 >> %scriptPath%
 if /I "%addPause%"=="Y" (
-    echo echo 按任意键退出   >> %scriptPath%
-    echo pause   >> %scriptPath%
+    echo    echo 按任意键退出   >> %scriptPath%
+    echo    pause   >> %scriptPath%
 ) else (
-    echo 你没有添加 pause,所以登陆后会自动退出脚本
+    echo.
+    echo 你没有添加pause,所以登陆后会自动退出脚本
+    echo.
 )
+echo ) else ( >> %scriptPath%
+echo     color 04 >> %scriptPath%
+echo     echo 登陆失败! >> %scriptPath%
+echo     echo 返回值中不包含 "result":"ok" 字样！ >> %scriptPath%
+echo     echo 请检登陆网址和网络连接是否正确！ >> %scriptPath%
+echo     echo 或联系开发者！ >> %scriptPath%
+echo     echo. >> %scriptPath%
+echo     echo. >> %scriptPath%
+echo     echo 输入任意键退出... >> %scriptPath%
+echo     pause >> %scriptPath%
+echo ) >> %scriptPath%
+
+
+
 REM 定义源路径和目标路径
 set "source=%~dp0登陆校园网.bat"
 set "destination=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\登陆校园网.bat"
 
+echo 正在将文件复制到系统自启动目录
 copy "%source%" "%destination%"
-echo 将文件复制到系统自启动目录
+REM 检查文件是否成功复制
+if exist "%destination%" (
+    echo 文件成功复制到目标路径
+) else (
+    echo 文件复制失败，请检查源路径和目标路径是否正确
+)
 echo.
-set /p choice=是否删除原文件？(输入Y/N) 
+set /p choice=是否删除原文件?(输入Y/N) 
 echo.
 if /i "%choice%"=="Y" (
     del "%source%"
-    echo 脚本已复制到系统自启动目录并删除原文件
+    echo 以删除原文件
     echo.
 ) else (
-    echo 脚本已复制到系统自启动目录没有删除原文件
+    echo 没有删除原文件
     echo.
 )
 echo 如果没有出现文件,请把脚本放到一个没有权限问题的目录下再次尝试(如下载目录和桌面)
