@@ -1,5 +1,8 @@
-@REM 本脚本由chen6019编写,用于登陆重庆化工职业学院校园网,生成开机自动链接脚本,一键打开开机自启文件夹,一键退出功能
+@REM 本脚本仅供学习交流使用,请勿用于非法用途,否则后果自负!
+@REM chen6019编写,用于登陆重庆化工职业学院校园网(可自行修改网址),生成开机自动链接脚本,一键打开开机自启文件夹,一键退出.功能
 @REM 感谢使用,如果有问题请联系我,邮箱:mc_chen6019@qq.com
+@REM 注意：
+@REM - 请将"http://172.17.100.200/a70.htm"替换为你的校园网登陆网址
 @echo off
 @chcp 65001
 @setlocal EnableDelayedExpansion
@@ -7,9 +10,22 @@
 
 :menu
 echo.
-echo 请选择操作
+echo =======================================
 echo.
-choice /c 1234 /m "【1】打开登陆网址 【2】生成开机自动链接脚本【3】一键打开开自启文件夹【4】一键退出"
+echo 需要先获取到校园网的登陆链接
+echo.
+echo 打开校园网的登陆网址
+echo 打开开发者工具按F12
+echo 选择网络(英文为network)
+echo 然后登陆校园网,找到下面第一个get请求的网址
+echo 就是复制请求url里的内容,全部复制下来
+echo 在第二步中粘贴到脚本中
+echo.
+echo tips:点击鼠标右键可以直接粘贴(无需Ctrl+V)
+echo.
+echo 请选择操作:
+echo.
+choice /c 12345 /m "【1】打开登陆网址 【2】生成开机自动登陆脚本【3】一键打开开自启文件夹【4】打开仓库网址(一般用于更新脚本) 【5】一键退出脚本"
 set "userChoice="
 set /a userChoice=%errorlevel%
 
@@ -18,15 +34,17 @@ if %userChoice% equ 1 (
     call :setShutdown
 ) else if %userChoice% equ 2 (
     call :cancelShutdown
-)  else if %userChoice% equ 3 (
+) else if %userChoice% equ 3 (
     call :open
 ) else if %userChoice% equ 4 (
+    call :openRepository
+) else if %userChoice% equ 5 (
     call :exitScript
 )
 
 :setShutdown
 echo.
-echo 打开浏览器访问校园网登陆网址？您是否要继续此操作？(Y/N)
+echo 打开浏览器访问校园网登陆网址(可自行修改网址)?您是否要继续此操作?(Y/N)
 set /p choice=
 set choice=%choice:~0,1%
 if /I "%choice%"=="Y" (
@@ -37,15 +55,28 @@ if /I "%choice%"=="Y" (
     goto :menu
 )
 :Start
+@REM 设置校园网登陆网址
 set "url=http://172.17.100.200/a70.htm"
+
+@REM 打开浏览器并访问校囐网登陆网址
 start "" %url%
+if %errorlevel% neq 0 (
+    echo 打开浏览器失败，请检查你的系统设置。
+    echo.
+    goto :menu
+
+)
+
+echo 浏览器已成功打开，正在访问校园网登陆网址...
 goto :menu
 
 :cancelShutdown
 echo.
 color 04
 echo ====================================================
-echo 生成开机自动登陆脚本?注意:需要你获取到登陆链接(打开校园网的登陆网址,打开开发者工具按F12,选择网络(英文为network),然后登陆校园网,找到第一个get请求的网址就是了),注意:再次生成会覆盖旧的文件!您是否要继续此操作?(Y/N)
+echo 生成开机自动登陆脚本？
+echo.
+echo 注意:再次生成会覆盖旧的文件！！！！您是否要继续此操作?(Y/N)
 echo ====================================================
 set /p choice=
 set choice=!choice:~0,1!
@@ -63,9 +94,8 @@ if /I "%choice%"=="Y" (
 :createScript
 echo 请输入登陆链接:
 set /p url=
-echo 是否需要添加 pause?添加会在登陆成功后保留结果窗口(一般由于调试)(Y/N或y/n)
+echo 是否需要添加 pause？ 添加会在登陆成功后保留结果窗口(一般由于调试)(Y/N或y/n)
 set /p addPause=
-
 
 set "scriptPath=%~dp0登陆校园网.bat"
 echo @echo off > %scriptPath%
@@ -115,7 +145,7 @@ REM 检查文件是否成功复制
 if exist "%destination%" (
     echo 文件成功复制到目标路径
 ) else (
-    echo 文件复制失败，请检查源路径和目标路径是否正确
+    echo 文件复制失败,请检查是否拥有写入权限和文件是否生成
 )
 echo.
 set /p choice=是否删除原文件?(输入Y/N) 
@@ -136,5 +166,18 @@ goto :menu
 start "" shell:startup
 goto :menu
 
+:openRepository
+echo 是否打开仓库网址?(Y/N)
+set /p choice=
+set choice=%choice:~0,1%
+if /I "%choice%"=="Y" (
+    echo.
+    start "" https://github.com/chen6019/Windows-bat
+    goto :menu
+) else (
+    echo 您选择了取消
+    goto :menu
+)
+
 :exitScript
-exit
+exit 0
