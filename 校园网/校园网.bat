@@ -63,7 +63,7 @@ if /I "%choice%"=="Y" (
 set /p "url=请输入登陆网址（默认为http://172.17.100.200/a70.htm可直接回车）:"
 if "%url%"=="" set "url=http://172.17.100.200/a70.htm"
 
-@REM 打开浏览器并访问校囐网登陆网址
+@REM 打开浏览器并访问校园网登陆网址
 start "" %url%
 if %errorlevel% neq 0 (
     echo 打开浏览器失败，请检查你的系统设置。
@@ -102,9 +102,14 @@ if /I "%choice%"=="Y" (
 
 
 :createScript
-echo 请输入登陆链接:(默认值为空)
+echo 请输入登陆链接:
 set "url="
 set /p url=
+if "%url%"=="" (
+    echo 你没有输入url,请重新输入
+    goto :createScript
+)
+
 
 echo 是否需要添加 pause？ 添加会在登陆成功后保留结果窗口(一般由于调试)
 echo 默认值为N (Y/N)
@@ -197,7 +202,7 @@ set choice=%choice:~0,1%
 
 if /I "%choice%"=="Y" (
     echo.
-    start "" https://github.com/chen6019/Windows-bat
+    start "" https://github.com/chen6019/Windows-bat/tree/main/校园网
     goto :menu
 ) else (
     echo 您选择了取消
