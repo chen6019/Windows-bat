@@ -48,7 +48,7 @@ echo 默认值为Y (Y/N?)
 
 set "choice="
 set /p choice=
-if "choice"=="" set "choice=Y"
+if "%choice%"=="" set "choice=Y"
 set choice=%choice:~0,1%
 if /I "%choice%"=="Y" (
     echo.
@@ -88,7 +88,7 @@ echo ====================================================
 
 set "choice="
 set /p choice=
-if "choice"=="" set "choice=Y"
+if "%choice%"=="" set "choice=Y"
 set choice=%choice:~0,1%
 if /I "%choice%"=="Y" (
     echo.
@@ -115,7 +115,7 @@ echo 是否需要添加 pause？ 添加会在登陆成功后保留结果窗口(�
 echo 默认值为N (Y/N)
 set "addPause="
 set /p addPause=
-if "addPause"=="" set "addPause=N"
+if "%addPause%"=="" set "addPause=N"
 set addPause=%addPause:~0,1%
 
 set "scriptPath=%~dp0登陆校园网.bat"
